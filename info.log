@@ -1,0 +1,34 @@
+2021-09-23 15:02:08,965 [ERROR] CTSUNET: Logging an uncaught exception
+Traceback (most recent call last):
+  File "C:\Program Files\JetBrains\PyCharm Community Edition 2019.1.3\helpers\pydev\pydevd.py", line 1758, in <module>
+    main()
+  File "C:\Program Files\JetBrains\PyCharm Community Edition 2019.1.3\helpers\pydev\pydevd.py", line 1752, in main
+    globals = debugger.run(setup['file'], None, None, is_module)
+  File "C:\Program Files\JetBrains\PyCharm Community Edition 2019.1.3\helpers\pydev\pydevd.py", line 1147, in run
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "C:\Program Files\JetBrains\PyCharm Community Edition 2019.1.3\helpers\pydev\_pydev_imps\_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "Z:/experiments/airway_labeling_t7828/gclobe/algorithm/test.py", line 1858, in <module>
+    segment_lobes(a, b, args.out_ext)
+  File "Z:/experiments/airway_labeling_t7828/gclobe/algorithm/test.py", line 1751, in segment_lobes
+    handle = segment_lobe_init()
+  File "Z:/experiments/airway_labeling_t7828/gclobe/algorithm/test.py", line 1812, in segment_lobe_init
+    lobe_seg_instance = LobeSegmentationTSTestCOVID(settings)
+  File "Z:/experiments/airway_labeling_t7828/gclobe/algorithm/test.py", line 1518, in __init__
+    self.reload_model_from_cache()
+  File "Z:/experiments/airway_labeling_t7828/gclobe/algorithm/test.py", line 734, in reload_model_from_cache
+    list_of_files = glob.glob(self.exp_path + '/*.pth')
+AttributeError: 'LobeSegmentationTSTestCOVID' object has no attribute 'exp_path'
+2021-09-23 15:04:08,125 [INFO] CTSUNET: Test performs Regional Proposal? True
+2021-09-23 15:04:50,894 [INFO] CTSUNET: start {'uid': '10110_st000', 'size': (188, 256, 256), 'spacing': (1.409999966621399, 1.409999966621399, 1.409999966621399), 'origin': (1630.5, -180.11619567871094, -180.11619567871094), 'original_spacing': (0.5, 0.7049999833106995, 0.7049999833106995), 'original_size': (529, 512, 512), 'direction': [0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0], 'GaussianBlur': {'v': 0.6, 'sigma': (0.6, 0.601)}, 'size_before_resample': (529, 512, 512), 'resample_factor': 2}
+2021-09-23 15:07:53,019 [INFO] CTSUNET: post processing time:24.192662715911865
+2021-09-23 15:07:53,049 [INFO] CTSUNET: Total Time:217.0549032688141, 10110_st000.
+2021-09-23 15:24:42,889 [INFO] CTSUNET: Test performs Regional Proposal? True
+2021-09-23 15:28:18,583 [INFO] CTSUNET: Test performs Regional Proposal? True
+2021-09-23 15:28:33,793 [INFO] CTSUNET: start {'uid': '10110_st000', 'size': (188, 256, 256), 'spacing': (1.409999966621399, 1.409999966621399, 1.409999966621399), 'origin': (1630.5, -180.11619567871094, -180.11619567871094), 'original_spacing': (0.5, 0.7049999833106995, 0.7049999833106995), 'original_size': (529, 512, 512), 'direction': [0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0], 'GaussianBlur': {'v': 0.6, 'sigma': (0.6, 0.601)}, 'size_before_resample': (529, 512, 512), 'resample_factor': 2}
+2021-09-23 15:29:54,632 [INFO] CTSUNET: post processing time:27.459503889083862
+2021-09-23 15:29:54,666 [INFO] CTSUNET: Total Time:88.42725801467896, 10110_st000.
+2021-09-27 12:07:53,231 [INFO] CTSUNET: Test performs Regional Proposal? True
+2021-09-27 12:08:08,937 [INFO] CTSUNET: start {'uid': '10110_st000', 'size': (188, 256, 256), 'spacing': (1.409999966621399, 1.409999966621399, 1.409999966621399), 'origin': (1630.5, -180.11619567871094, -180.11619567871094), 'original_spacing': (0.5, 0.7049999833106995, 0.7049999833106995), 'original_size': (529, 512, 512), 'direction': [0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0], 'GaussianBlur': {'v': 0.6, 'sigma': (0.6, 0.601)}, 'size_before_resample': (529, 512, 512), 'resample_factor': 2}
+2021-09-27 12:09:59,399 [INFO] CTSUNET: post processing time:26.07974600791931
+2021-09-27 12:09:59,436 [INFO] CTSUNET: Total Time:118.03460478782654, 10110_st000.

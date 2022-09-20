@@ -2,15 +2,12 @@ import os
 os.environ['DGLBACKEND'] = 'pytorch'
 import uuid
 import networkx as nx
-import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from torch.utils.checkpoint import checkpoint, checkpoint_sequential
-# from dgl import load_backend
+from torch.utils.checkpoint import checkpoint
 
-# load_backend(os.environ.get('DGLBACKEND', 'pytorch').lower())
 import dgl
 
 FOV_NET_DICT = {
@@ -295,28 +292,28 @@ def non_local_scale_dot_product(x_theta, x_phi):
     return f_div_C
 
 def normal_wrapper(normal_method, in_ch, in_ch_div=2):
-    if normal_method is "bn":
+    if normal_method == "bn":
         return nn.BatchNorm3d(in_ch)
-    elif normal_method is "bnt":
+    elif normal_method == "bnt":
         # this should be used when batch_size=1
         return nn.BatchNorm3d(in_ch, affine=True, track_running_stats=False)
-    elif normal_method is "bntna":
+    elif normal_method == "bntna":
         # this should be used when batch_size=1
         return nn.BatchNorm3d(in_ch, affine=False, track_running_stats=False)
-    elif normal_method is "ln":
+    elif normal_method == "ln":
         return nn.GroupNorm(1, in_ch)
-    elif normal_method is "lnna":
+    elif normal_method == "lnna":
         return nn.GroupNorm(1, in_ch, affine=False)
-    elif normal_method is "in":
+    elif normal_method == "in":
         return nn.GroupNorm(in_ch, in_ch)
     else:
         return nn.GroupNorm(in_ch_div, in_ch)
 
 
 def act_wrapper(act_method, num_parameters=1, init=0.25):
-    if act_method is "relu":
+    if act_method == "relu":
         return nn.ReLU(inplace=True)
-    elif act_method is "prelu":
+    elif act_method == "prelu":
         return nn.PReLU(num_parameters, init)
     else:
         raise NotImplementedError

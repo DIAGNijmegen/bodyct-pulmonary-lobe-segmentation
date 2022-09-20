@@ -437,7 +437,7 @@ def resample_sitk_image(sitk_image, spacing=None, interpolator=None,
     orig_origin = sitk_image.GetOrigin()
     orig_direction = sitk_image.GetDirection()
     orig_spacing = np.array(sitk_image.GetSpacing())
-    orig_size = np.array(sitk_image.GetSize(), dtype=np.int)
+    orig_size = np.array(sitk_image.GetSize(), dtype=np.int32)
 
     if not spacing:
         min_spacing = orig_spacing.min()
@@ -1866,11 +1866,17 @@ def segment_lobe(handle, scan, scan_meta):
 if __name__ == "__main__":
     print("Docker start running job.")
     parser = ArgumentParser()
+    parser.add_argument('--input_path', type=str,
+                        default='/input/',
+                        help="set up scan path.")
+    parser.add_argument('--output_path', type=str,
+                        default='/output/',
+                        help="set up scan path.")
     parser.add_argument('--out_ext', type=str, nargs='?',
                         default="mha",
                         help="set up scan path.")
     args = parser.parse_args()
     # a = r"D:\workspace\datasets\covidra\derived_s3\original\scan/"
     # b = r"D:\workspace\datasets\covidra\derived_s3\original\testout/"
-    segment_lobes('/input/', '/output/', args.out_ext)
+    segment_lobes(args.input_path, args.output_path, args.out_ext)
     # segment_lobes(a, b, args.out_ext)

@@ -1,5 +1,7 @@
 import os
 os.environ['DGLBACKEND'] = 'pytorch'
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 import uuid
 import networkx as nx
 import torch

@@ -17,7 +17,7 @@ RELOAD_DICT_LIST = ["model_dict", "metric"]
 EXP_NAME = "CTSUNET"
 
 # Training iterations and sizes.
-RESAMPLE_MODE = "fixed_output_size"
+RESAMPLE_MODE = "fixed_size"
 USE_PROPOSAL = True
 POST_METHOD="nn"
 SCAN_PAD_NUM = 16

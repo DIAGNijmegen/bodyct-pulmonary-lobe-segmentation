@@ -1018,6 +1018,12 @@ class Resample(object):
             new_size[0] = int(round(current_size[0] * spacing[0] / require_spacing[0]))
             new_size[1] = int(round(current_size[1] * spacing[1] / require_spacing[1]))
             factor = 2
+        elif self.mode == "fixed_size":
+            current_size = sample['meta']['size']
+            ratios = np.asarray(current_size) / np.asarray(self.size)
+            require_spacing = (spacing * ratios).tolist()
+            new_size = self.size[:]
+            factor = 2
         elif self.mode == "spacing_size_match":
             require_spacing = self.factor[:]
             new_size = self.size[:]

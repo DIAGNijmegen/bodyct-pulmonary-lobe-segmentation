@@ -104,12 +104,12 @@ class TSUnet(nn.Module):
         self.unet2.init(initializer)
 
     def scan_level_inference(self, scan):
-        ds_scan = F.interpolate(scan.float(), scale_factor=self.ds_rate, mode='trilinear', align_corners=True)
+        ds_scan = F.interpolate(scan.float(), scale_factor=self.ds_rate, mode='trilinear', align_corners=True, recompute_scale_factor=True)
         if torch.cuda.is_available() and self.is_cuda:
             ds_scan = ds_scan.cuda()
         out11 = self.unet1(ds_scan)[0].cpu().float()
         # out11 = self.unet1(ds_scan)[0]
-        r_out11 = F.interpolate(out11, size=scan.shape[-3:], mode='trilinear', align_corners=True)
+        r_out11 = F.interpolate(out11, size=scan.shape[-3:], mode='trilinear', align_corners=True, recompute_scale_factor=False)
         inf11 = F.softmax(r_out11, dim=1)
         return inf11
 
@@ -123,7 +123,7 @@ class TSUnet(nn.Module):
             pad_scan = pad_scan.float()
         else:
             previous_t = None
-        ds_pad_scan = F.interpolate(pad_scan, scale_factor=self.ds_rate, mode='trilinear', align_corners=True)
+        ds_pad_scan = F.interpolate(pad_scan, scale_factor=self.ds_rate, mode='trilinear', align_corners=True, recompute_scale_factor=True)
         if previous_t is not None:
             ds_pad_scan = ds_pad_scan.type(previous_t)
         if torch.cuda.is_available() and self.is_cuda:
@@ -137,8 +137,8 @@ class TSUnet(nn.Module):
         assert (out11.shape[-3:] == ds_pad_scan.shape[-3:])
         assert (out12.shape[-3:] == ds_pad_scan.shape[-3:])
         # step.2 reconstruct inference from stage 1
-        r_out11 = F.interpolate(out11, size=pad_scan.shape[-3:], mode='trilinear', align_corners=True)
-        r_out12 = F.interpolate(out12, size=pad_scan.shape[-3:], mode='trilinear', align_corners=True)
+        r_out11 = F.interpolate(out11, size=pad_scan.shape[-3:], mode='trilinear', align_corners=True, recompute_scale_factor=False)
+        r_out12 = F.interpolate(out12, size=pad_scan.shape[-3:], mode='trilinear', align_corners=True, recompute_scale_factor=False)
         inf11 = F.softmax(r_out11, dim=1)
         inf12 = torch.sigmoid(r_out12)
         # print("inf11.shape[-3:] :{}, pad_scan.shape[-3:]:{} ".format(inf11.shape[-3:], pad_scan.shape[-3:]))
@@ -190,7 +190,7 @@ class TSUnet(nn.Module):
                 pad_scan = pad_scan.float()
             else:
                 previous_t = None
-            ds_pad_scan = F.interpolate(pad_scan, scale_factor=self.ds_rate, mode='trilinear', align_corners=True)
+            ds_pad_scan = F.interpolate(pad_scan, scale_factor=self.ds_rate, mode='trilinear', align_corners=True, recompute_scale_factor=True)
             if torch.cuda.is_available() and self.is_cuda:
                 ds_pad_scan = ds_pad_scan.cuda()
             if previous_t is not None:
@@ -203,8 +203,8 @@ class TSUnet(nn.Module):
             if out12.type() == "torch.HalfTensor":
                 out12 = out12.float()
             # step.2 reconstruct inference from stage 1
-            r_out11 = F.interpolate(out11, size=pad_scan.shape[-3:], mode='trilinear', align_corners=True)
-            r_out12 = F.interpolate(out12, size=pad_scan.shape[-3:], mode='trilinear', align_corners=True)
+            r_out11 = F.interpolate(out11, size=pad_scan.shape[-3:], mode='trilinear', align_corners=True, recompute_scale_factor=False)
+            r_out12 = F.interpolate(out12, size=pad_scan.shape[-3:], mode='trilinear', align_corners=True, recompute_scale_factor=False)
             inf11 = F.softmax(r_out11, dim=1)
             inf12 = torch.sigmoid(r_out12)
             # print("inf11.shape[-3:] :{}, pad_scan.shape[-3:]:{} ".format(inf11.shape[-3:], pad_scan.shape[-3:]))
@@ -406,7 +406,7 @@ class CNet(nn.Module):
             end_nodes = list(set(end_nodes))
             g.add_edges_from(list(zip(end_nodes, [n] * len(end_nodes))))
 
-        graph = dgl.DGLGraph(g)
+        graph = dgl.from_networkx(g)
         return graph
 
     def compute_cross_x(self, e_xs, n_x):
@@ -527,7 +527,7 @@ class CBNet(nn.Module):
     def build_geo_feature(self, x, crop_slice_list, scan_shape, n_layers, padding, normalize=True):
         spatial_size = x.shape[-3:]
         t = torch.ones(spatial_size).type(x.type())
-        p = t.nonzero().type(x.type())
+        p = torch.nonzero(t).type(x.type())
         if crop_slice_list is None:
             if normalize:
                 p /= (torch.Tensor(list(spatial_size)).type(x.type()) - 1.0)
@@ -574,7 +574,7 @@ class CBNet(nn.Module):
             end_nodes = list(set(end_nodes))
             g.add_edges_from(list(zip(end_nodes, [n] * len(end_nodes))))
 
-        graph = dgl.DGLGraph(g)
+        graph = dgl.from_networkx(g)
 
         return graph.to(fv.device)
 
@@ -748,7 +748,7 @@ class UpsampleConvBlock5d(nn.Module):
 
     def forward(self, inputs, cats, args=None):
         up_inputs = F.interpolate(inputs, size=None, scale_factor=self.scale_factor,
-                                  mode='trilinear', align_corners=True)
+                                  mode='trilinear', align_corners=True, recompute_scale_factor=True)
         x = crop_concat_5d(up_inputs, cats)
         x = checkpoint(self.conv_blocks, x)
         return x

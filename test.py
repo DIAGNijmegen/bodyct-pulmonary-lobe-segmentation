@@ -1631,7 +1631,7 @@ class LobeSegmentationTSTestCOVID(JobRunner):
             original_spacing = meta['original_spacing']
             spacing = meta['spacing']
             heatmap_p = torch.stack([F.interpolate(heatmap_p[:, n, ::].unsqueeze(0), size=original_size,
-                                                   mode='trilinear').squeeze(0).squeeze(0)
+                                                   mode='trilinear', align_corners=True, recompute_scale_factor=False).squeeze(0).squeeze(0)
                                     .float().cpu() for n in range(heatmap_p.shape[1])])
             heatmap_np = heatmap_p.numpy().astype(np.float32)
             prediction_np = np.argmax(heatmap_np, 0).astype(np.uint8)

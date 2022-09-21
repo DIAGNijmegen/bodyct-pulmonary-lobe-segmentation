@@ -322,13 +322,7 @@ def act_wrapper(act_method, num_parameters=1, init=0.25):
 
 
 def checkpoint_wrapper(module, segments, *tensors):
-    if segments > 0:
-        # if type(module) in [nn.Sequential, nn.ModuleList, list]:
-        #     return checkpoint_sequential(module, segments, *tensors)
-        # else:
-        return checkpoint(module, *tensors)
-    else:
-        return module(*tensors)
+    return module(*tensors)
 
 
 def crop_concat_5d(t1, t2):
@@ -527,7 +521,7 @@ class CBNet(nn.Module):
     def build_geo_feature(self, x, crop_slice_list, scan_shape, n_layers, padding, normalize=True):
         spatial_size = x.shape[-3:]
         t = torch.ones(spatial_size).type(x.type())
-        p = torch.nonzero(t).type(x.type())
+        p = torch.nonzero(t, as_tuple=False).type(x.type())
         if crop_slice_list is None:
             if normalize:
                 p /= (torch.Tensor(list(spatial_size)).type(x.type()) - 1.0)
@@ -750,7 +744,7 @@ class UpsampleConvBlock5d(nn.Module):
         up_inputs = F.interpolate(inputs, size=None, scale_factor=self.scale_factor,
                                   mode='trilinear', align_corners=True, recompute_scale_factor=True)
         x = crop_concat_5d(up_inputs, cats)
-        x = checkpoint(self.conv_blocks, x)
+        x = self.conv_blocks(x)
         return x
 
 
@@ -890,9 +884,9 @@ class Unet3DCrossBiGeneric(nn.Module):
         for idx, ds in enumerate(self.ds_modules):
             if self.checkpoint_layers[idx] > 0:
                 if idx == 0:
-                    ds_feat_list.append(checkpoint(ds, ds_feat_list[-1][-1], self.dummy))
+                    ds_feat_list.append(ds(ds_feat_list[-1][-1], self.dummy))
                 else:
-                    ds_feat_list.append(checkpoint(ds, ds_feat_list[-1][-1]))
+                    ds_feat_list.append(ds(ds_feat_list[-1][-1]))
             else:
                 ds_feat_list.append(ds(ds_feat_list[-1][-1]))
         ds_feat_list.pop(0)
@@ -904,7 +898,7 @@ class Unet3DCrossBiGeneric(nn.Module):
         xbg = self.middle_psa(xbg, pargs)
         us_feat_list = [xbg]
         for us, ds_feat in zip(self.us_modules, reversed(ds_feat_list)):
-            us_feat_list.append(checkpoint(us, us_feat_list[-1], ds_feat[0]))
+            us_feat_list.append(us(us_feat_list[-1], ds_feat[0]))
         end_f = us_feat_list[-1]
         o_list = [out(end_f) for out in self.outs]
 
@@ -1011,9 +1005,9 @@ class Unet3DCrossLocalGeneric(nn.Module):
         for idx, ds in enumerate(self.ds_modules):
             if self.checkpoint_layers[idx] > 0:
                 if idx == 0:
-                    ds_feat_list.append(checkpoint(ds, ds_feat_list[-1][-1], self.dummy))
+                    ds_feat_list.append(ds(ds_feat_list[-1][-1], self.dummy))
                 else:
-                    ds_feat_list.append(checkpoint(ds, ds_feat_list[-1][-1]))
+                    ds_feat_list.append(ds(ds_feat_list[-1][-1]))
             else:
                 ds_feat_list.append(ds(ds_feat_list[-1][-1]))
         ds_feat_list.pop(0)
@@ -1025,8 +1019,7 @@ class Unet3DCrossLocalGeneric(nn.Module):
         xbg = self.non_local_module(xbg, pargs)
         us_feat_list = [xbg]
         for us, ds_feat in zip(self.us_modules, reversed(ds_feat_list)):
-            us_feat_list.append(checkpoint(us, us_feat_list[-1], ds_feat[0]))
-            # us_feat_list.append(us(us_feat_list[-1], ds_feat[0]))
+            us_feat_list.append(us(us_feat_list[-1], ds_feat[0]))
         end_f = us_feat_list[-1]
         o_list = [out(end_f) for out in self.outs]
         if previous_t is not None:

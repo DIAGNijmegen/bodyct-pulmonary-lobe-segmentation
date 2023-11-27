@@ -696,10 +696,6 @@ class JobRunner:
         self.is_cuda = self.settings.IS_CUDA & torch.cuda.is_available()
         if self.is_cuda:
             self.model.cuda()
-            if torch.cuda.device_count() > 1:
-                self.logger.info("Let's use", torch.cuda.device_count(), "GPUs!")
-                # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
-                self.model = torch.nn.DataParallel(self.model)
             self.model.is_cuda = True
         else:
             self.model.is_cuda = False
